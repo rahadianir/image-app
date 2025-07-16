@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Image</title>
+</head>
+<body>
+  <h1>Upload JPEG Image</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/jpeg" required />
+    <button type="submit">Upload</button>
+  </form>
+
+  <p id="status"></p>
+  <img id="image" alt="preview"></img>
+
+  <script>
+    document.getElementById('uploadForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const res = await fetch('http://localhost:8080/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const status = document.getElementById('status');
+      if (res.ok) {
+        const body = await res.json()
+        console.log(body)
+        status.textContent = 'Upload successful!';
+        document.getElementById('image').alt = body.data.url
+      } else {
+        status.textContent = 'Upload failed.';
+      }
+    };
+  </script>
+</body>
+</html>

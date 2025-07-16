@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gallery</title>
+</head>
+<body>
+  <h1>Uploaded Images</h1>
+  <div id="gallery"></div>
+
+  <script>
+    async function loadGallery() {
+      const res = await fetch('http://localhost:8080/images');
+      const images = await res.json();
+
+      const gallery = document.getElementById('gallery');
+      images.data.forEach(img => {
+        const imgEl = document.createElement('img');
+        imgEl.src = img.url; 
+        imgEl.alt = img.file_name;
+        imgEl.style.maxWidth = "200px";
+        imgEl.style.margin = "10px";
+        gallery.appendChild(imgEl);
+      });
+    }
+
+    loadGallery();
+  </script>
+</body>
+</html>
