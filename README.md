@@ -9,21 +9,21 @@ A Dockerized application for uploading JPEG images and viewing them in a browser
 - Persistent volume for storing uploaded images
 
 ## Overview
-### Nginx (port 80):
+### Nginx :
 * Serves static files (upload.html, gallery.html, and uploaded images)
 * Proxies /api/* to Go backend
 
-### Go App:
+### Go App :
 * POST /upload to accept and validate JPEG uploads (<=10MB)
 * Stores image metadata in PostgreSQL
 * Writes image file to specified directory with `filename-uuid.jpeg` format to avoid collision 
 * GET /images to list uploaded image metadata (filename, URL, size, timestamp)
 
-### PostgreSQL:
+### PostgreSQL :
 * Stores metadata in project.images table
 * Initializes schema on first launch from migrations/database.sql
 
-### Network separation:
+### Network separation :
 * api-network: Nginx and Go containers
 * repository-network: Go and PostgreSQL containers
 
@@ -35,6 +35,7 @@ git clone https://github.com/rahadianir/image-app.git
 cd image-app
 ```
 ### 2. Build & Run Services
+Make sure you have docker compose installed and run this command to build and run the services.
 
 ```bash
 docker compose up --build -d
@@ -45,7 +46,11 @@ Upload page: http://localhost/upload.html
 
 Gallery page: http://localhost/gallery.html
 
-Backen API on port 8080
+Nginx serves on port 80
+
+Backend API on port 8080
+
+Postgresql on port 5432
 
 ### 4. Clean up
 ```bash
