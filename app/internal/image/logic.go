@@ -9,6 +9,8 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -27,8 +29,10 @@ func NewImageLogic(deps *core.Dependency, imgRepo ImageRepositoryInterface) *Ima
 
 func (l *ImageLogic) UploadImage(ctx context.Context, file io.Reader, fileName string, size int64) (model.ImageMeta, error) {
 	id := uuid.NewString()
+	ext := filepath.Ext(fileName)
+	name := strings.TrimSuffix(fileName, ext)
 
-	dir := fmt.Sprintf("%s/%s", "static", fileName)
+	dir := fmt.Sprintf("%s/%s-%s.%s", "static", name, id, ext)
 	dst, err := os.Create(dir)
 	if err != nil {
 		l.deps.Logger.ErrorContext(ctx, "failed to create file", slog.Any("error", err))
