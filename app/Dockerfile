@@ -19,6 +19,9 @@ WORKDIR /app
 
 # Copy executable from build step
 COPY --from=build /app/image-app image-app
+RUN mkdir static
+COPY --from=build /app/static/gallery.html static/gallery.html
+COPY --from=build /app/static/upload.html static/upload.html
 
 EXPOSE 8080
 

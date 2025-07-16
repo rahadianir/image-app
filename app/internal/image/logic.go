@@ -44,7 +44,7 @@ func (l *ImageLogic) UploadImage(ctx context.Context, file io.Reader, fileName s
 	data := model.ImageMeta{
 		ID:       id,
 		FileName: fileName,
-		URL:      fmt.Sprintf("%s/%s", "localhost", dir),
+		URL:      fmt.Sprintf("%s/%s", "http://localhost", dir),
 		FileSize: size,
 	}
 	err = l.imgRepo.Store(ctx, data)
