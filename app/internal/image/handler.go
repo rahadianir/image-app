@@ -27,6 +27,8 @@ func NewImageHandler(deps *core.Dependency, imgLogic ImageLogicInterface) *Image
 
 func (h *ImageHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	// parse request body for the file
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		h.deps.Logger.WarnContext(ctx, "failed to read request body", slog.Any("error", err))
@@ -38,6 +40,7 @@ func (h *ImageHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	// image extension validation
 	if strings.ToLower(filepath.Ext(header.Filename)) != ".jpeg" {
 		h.deps.Logger.WarnContext(ctx, "invalid image format/extension")
 		xhttp.SendJSONResponse(w, xhttp.BaseResponse{
@@ -46,6 +49,7 @@ func (h *ImageHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// image size validation 10 MB = 10 * 1024 * 1024 bytes
 	if header.Size > 10*1024*1024 {
 		h.deps.Logger.WarnContext(ctx, "invalid image size, must below 10 MB")
 		xhttp.SendJSONResponse(w, xhttp.BaseResponse{
@@ -54,6 +58,8 @@ func (h *ImageHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// passing the io.reader for more efficient memory usage,
+	// streaming the file data instead of using buffer to contain it first
 	data, err := h.imgLogic.UploadImage(ctx, file, header.Filename, header.Size)
 	if err != nil {
 		h.deps.Logger.ErrorContext(ctx, "failed to upload image", slog.Any("error", err))

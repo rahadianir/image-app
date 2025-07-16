@@ -28,11 +28,17 @@ func NewImageLogic(deps *core.Dependency, imgRepo ImageRepositoryInterface) *Ima
 }
 
 func (l *ImageLogic) UploadImage(ctx context.Context, file io.Reader, fileName string, size int64) (model.ImageMeta, error) {
+	// generate uuid to avoid collision in name
 	id := uuid.NewString()
+
+	// getting file extension for name alteration
 	ext := filepath.Ext(fileName)
 	name := strings.TrimSuffix(fileName, ext)
 
+	// setting up path to file
 	dir := fmt.Sprintf("%s/%s-%s.%s", "static", name, id, ext)
+	
+	// create file to write
 	dst, err := os.Create(dir)
 	if err != nil {
 		l.deps.Logger.ErrorContext(ctx, "failed to create file", slog.Any("error", err))
@@ -40,17 +46,21 @@ func (l *ImageLogic) UploadImage(ctx context.Context, file io.Reader, fileName s
 	}
 	defer dst.Close()
 
+	// write the stream into the file
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		l.deps.Logger.ErrorContext(ctx, "failed to write file upload", slog.Any("error", err))
 		return model.ImageMeta{}, err
 	}
+
+	// prepare to store file metadata
 	data := model.ImageMeta{
 		ID:       id,
 		FileName: fileName,
 		URL:      fmt.Sprintf("%s/%s", "http://localhost", dir),
 		FileSize: size,
 	}
+	
 	err = l.imgRepo.Store(ctx, data)
 	if err != nil {
 		l.deps.Logger.ErrorContext(ctx, "failed to store metadata to database", slog.Any("error", err))

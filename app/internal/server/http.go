@@ -56,7 +56,8 @@ func StartServer(ctx context.Context) {
 
 	err := srv.ListenAndServe()
 	if err != nil {
-		panic(err)
+		deps.Logger.ErrorContext(ctx, "failed to listen and serve", slog.Any("error", err))
+		os.Exit(1)
 	}
 }
 
